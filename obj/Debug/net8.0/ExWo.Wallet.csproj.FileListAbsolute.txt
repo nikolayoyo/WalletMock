@@ -1,0 +1,14 @@
+/Users/nikolayordanov/Documents/ExWo.Wallet/bin/Debug/net8.0/ExWo.Wallet
+/Users/nikolayordanov/Documents/ExWo.Wallet/bin/Debug/net8.0/ExWo.Wallet.deps.json
+/Users/nikolayordanov/Documents/ExWo.Wallet/bin/Debug/net8.0/ExWo.Wallet.runtimeconfig.json
+/Users/nikolayordanov/Documents/ExWo.Wallet/bin/Debug/net8.0/ExWo.Wallet.dll
+/Users/nikolayordanov/Documents/ExWo.Wallet/bin/Debug/net8.0/ExWo.Wallet.pdb
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/ExWo.Wallet.GeneratedMSBuildEditorConfig.editorconfig
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/ExWo.Wallet.AssemblyInfoInputs.cache
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/ExWo.Wallet.AssemblyInfo.cs
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/ExWo.Wallet.csproj.CoreCompileInputs.cache
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/ExWo.Wallet.dll
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/refint/ExWo.Wallet.dll
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/ExWo.Wallet.pdb
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/ExWo.Wallet.genruntimeconfig.cache
+/Users/nikolayordanov/Documents/ExWo.Wallet/obj/Debug/net8.0/ref/ExWo.Wallet.dll
