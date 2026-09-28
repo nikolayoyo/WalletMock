@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ExWo.Wallet.csproj" />
+  <Project Path="ExWo.Wallet.Tests/ExWo.Wallet.Tests.csproj" />
+</Solution>

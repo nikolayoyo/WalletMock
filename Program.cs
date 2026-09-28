@@ -1,14 +1,15 @@
 using System.Globalization;
+using ExWo.Wallet.Application;
 using ExWo.Wallet.Betting;
+using ExWo.Wallet.Domain;
 
-var random = new SystemRandomProvider();
-var gameEngine = new SlotGameEngine(random);
-
-var balance = 0m;
+var wallet = new PlayerWallet();
+var walletService = new WalletService(wallet);
+var bettingService = new BettingService(wallet, new SlotGameEngine(new SystemRandomProvider()));
 
 while (true)
 {
-    Console.Write("Please, submit action:\n");
+    Console.Write("Please, submit action:");
     var input = Console.ReadLine()?.Trim();
 
     if (string.IsNullOrEmpty(input))
@@ -19,30 +20,66 @@ while (true)
 
     if (command == "exit")
     {
-        Console.WriteLine("Thanks for playing");
+        Console.WriteLine("Thank you for playing! Hope to see you again soon.");
         break;
+    }
+
+    if (command == "deposit")
+    {
+        if (parts.Length != 2 || !decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var amount))
+        {
+            Console.WriteLine("Type: deposit <amount>");
+            continue;
+        }
+
+        var result = walletService.Deposit(amount);
+        if (!result.IsSuccess)
+        {
+            Console.WriteLine($"{result.Error}");
+            continue;
+        }
+
+        Console.WriteLine($"Your deposit of ${amount} was successful. Your current balance is: ${result.Value}");
+        continue;
+    }
+
+    if (command == "withdraw")
+    {
+        if (parts.Length != 2 || !decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var amount))
+        {
+            Console.WriteLine("Type: withdraw <amount>");
+            continue;
+        }
+
+        var result = walletService.Withdraw(amount);
+        if (!result.IsSuccess)
+        {
+            Console.WriteLine($"{result.Error}");
+            continue;
+        }
+
+        Console.WriteLine($"Your withdrawal of ${amount} was successful. Your current balance is: ${result.Value}");
+        continue;
     }
 
     if (command == "bet")
     {
         if (parts.Length != 2 || !decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var stake))
         {
-            Console.WriteLine("Usage: bet <amount>");
+            Console.WriteLine("Type: bet <amount>");
             continue;
         }
 
-        if (stake < 1m || stake > 10m)
+        var result = bettingService.PlaceBet(stake);
+        if (!result.IsSuccess)
         {
-            Console.WriteLine("Bets must be between $1 and $10.");
+            Console.WriteLine($"{result.Error}");
             continue;
         }
 
-        var outcome = gameEngine.Play(stake);
-        balance = balance - stake + outcome.Payout;
-
-        var message = outcome.Won
-            ? $"Congrats - you won ${outcome.Payout}! Your current balance is: ${balance}"
-            : $"No luck this time! Your current balance is: ${balance}";
+        var message = result.Value.Won
+            ? $"Congrats - you won ${result.Value.Payout}! Your current balance is: ${result.Value.NewBalance}"
+            : $"No luck this time! Your current balance is: ${result.Value.NewBalance}";
 
         Console.WriteLine(message);
         continue;
