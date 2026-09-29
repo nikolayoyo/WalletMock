@@ -1,7 +1,7 @@
-using System.Globalization;
 using ExWo.Wallet.Application;
 using ExWo.Wallet.Betting;
 using ExWo.Wallet.Domain;
+using ExWo.Wallet.CmdParser;
 
 var wallet = new PlayerWallet();
 var walletService = new WalletService(wallet);
@@ -9,81 +9,55 @@ var bettingService = new BettingService(wallet, new SlotGameEngine(new SystemRan
 
 while (true)
 {
-    Console.Write("Please, submit action:");
-    var input = Console.ReadLine()?.Trim();
+    Console.Write("Please, submit action:\n");
+    var input = Console.ReadLine()?.Trim() ?? string.Empty;
 
     if (string.IsNullOrEmpty(input))
         continue;
 
-    var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-    var command = parts[0].ToLowerInvariant();
-
-    if (command == "exit")
+    var parsed = CommandParser.Parse(input);
+    if (!parsed.IsSuccess)
     {
-        Console.WriteLine("Thank you for playing! Hope to see you again soon.");
-        break;
-    }
-
-    if (command == "deposit")
-    {
-        if (parts.Length != 2 || !decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var amount))
-        {
-            Console.WriteLine("Type: deposit <amount>");
-            continue;
-        }
-
-        var result = walletService.Deposit(amount);
-        if (!result.IsSuccess)
-        {
-            Console.WriteLine($"{result.Error}");
-            continue;
-        }
-
-        Console.WriteLine($"Your deposit of ${amount} was successful. Your current balance is: ${result.Value}");
+        Console.WriteLine($"{parsed.Error}\n");
         continue;
     }
 
-    if (command == "withdraw")
+    switch (parsed.Value)
     {
-        if (parts.Length != 2 || !decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var amount))
+        case ExitCommand:
+            Console.WriteLine("Thank you for playing! Hope to see you again soon.");
+            return;
+
+        case DepositCommand cmd:
         {
-            Console.WriteLine("Type: withdraw <amount>");
-            continue;
+            var result = walletService.Deposit(cmd.Amount);
+            Console.WriteLine(result.IsSuccess
+                ? $"Your deposit of ${cmd.Amount} was successful. Your current balance is: ${result.Value}\n"
+                : $"{result.Error}\n");
+            break;
         }
 
-        var result = walletService.Withdraw(amount);
-        if (!result.IsSuccess)
+        case WithdrawCommand cmd:
         {
-            Console.WriteLine($"{result.Error}");
-            continue;
+            var result = walletService.Withdraw(cmd.Amount);
+            Console.WriteLine(result.IsSuccess
+                ? $"Your withdrawal of ${cmd.Amount} was successful. Your current balance is: ${result.Value}\n"
+                : $"{result.Error}\n");
+            break;
         }
 
-        Console.WriteLine($"Your withdrawal of ${amount} was successful. Your current balance is: ${result.Value}");
-        continue;
+        case BetCommand cmd:
+        {
+            var result = bettingService.PlaceBet(cmd.Stake);
+            if (!result.IsSuccess)
+            {
+                Console.WriteLine($"{result.Error}\n");
+                break;
+            }
+            Console.WriteLine(result.Value.Won
+                ? $"Congrats - you won ${result.Value.Payout}! Your current balance is: ${result.Value.NewBalance}\n"
+                : $"No luck this time! Your current balance is: ${result.Value.NewBalance}\n");
+            break;
+        }
     }
-
-    if (command == "bet")
-    {
-        if (parts.Length != 2 || !decimal.TryParse(parts[1], NumberStyles.Number, CultureInfo.InvariantCulture, out var stake))
-        {
-            Console.WriteLine("Type: bet <amount>");
-            continue;
-        }
-
-        var result = bettingService.PlaceBet(stake);
-        if (!result.IsSuccess)
-        {
-            Console.WriteLine($"{result.Error}");
-            continue;
-        }
-
-        var message = result.Value.Won
-            ? $"Congrats - you won ${result.Value.Payout}! Your current balance is: ${result.Value.NewBalance}"
-            : $"No luck this time! Your current balance is: ${result.Value.NewBalance}";
-
-        Console.WriteLine(message);
-        continue;
-    }
-
-    Console.WriteLine("Unknown command.");
 }
