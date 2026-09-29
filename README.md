@@ -37,7 +37,7 @@ ExWo.Wallet/
 ├── Domain/             core types — wallet, ledger, result
 ├── Application/        use cases — WalletService, BettingService
 ├── Betting/            slot game engine and RNG abstraction
-├── Presentation/       command parsing — turns raw input into typed commands
+├── CmdParser/          command parsing — turns raw input into typed commands
 ├── Infrastructure/     session logger
 ├── logs/               per-session audit logs (gitignored)
 └── ExWo.Wallet.Tests/  unit + distribution tests
